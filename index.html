@@ -14,6 +14,9 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: #1b1b1d; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
 a:hover { opacity: .6; }
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto; }
+.lenis.lenis-stopped { overflow: clip; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 .goods-row { display: flex; justify-content: space-between; gap: 16px; width: 100%; padding: 0; border: 0; background: none; font: inherit; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em; text-align: left; color: #767676; cursor: pointer; }
 .goods-row:hover, .goods-row[aria-pressed="true"] { color: #1b1b1d; }
@@ -269,6 +272,25 @@ a:hover { opacity: .6; }
 </footer>
 
 </div>
+<script src="js/lenis.min.js"></script>
+<script>
+(function () {
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced || typeof Lenis === 'undefined') return;
+  var lenis = new Lenis({ duration: 1.2, smoothWheel: true });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      var target = id.length > 1 && document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target);
+    });
+  });
+})();
+</script>
 <script>
 (function () {
   var track = document.querySelector('.tfn-track');
