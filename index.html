@@ -15,6 +15,13 @@ body { margin: 0; background: #1b1b1d; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
 a:hover { opacity: .6; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.goods-row { display: flex; justify-content: space-between; gap: 16px; width: 100%; padding: 0; border: 0; background: none; font: inherit; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em; text-align: left; color: #767676; cursor: pointer; }
+.goods-row:hover, .goods-row[aria-pressed="true"] { color: #1b1b1d; }
+.goods-n { color: #767676; }
+.goods-thumb { padding: 0; border: 0; background: #d0d0d0; border-radius: 6px; overflow: hidden; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; }
+.goods-thumb img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.goods-thumb[aria-pressed="true"] { outline-color: #1b1b1d; }
+.goods-row:focus-visible, .goods-thumb:focus-visible { outline: 2px solid #af0096; outline-offset: 2px; }
 @media (max-width: 700px) { #story > svg { width: 220px !important; top: 64px !important; bottom: auto !important; right: -8% !important; } }
 </style>
 </head>
@@ -75,27 +82,23 @@ a:hover { opacity: .6; }
 <div style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #767676">2.0</div>
 <div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 28px">
 <h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">GOODS</h2>
-<a href="#goods" style="display: block"><img src="images/hat-black.jpg" alt="Black dad cap with white embroidered Five Nine mark" style="width: 100%; max-width: 420px; aspect-ratio: 4 / 5; object-fit: cover; display: block; border-radius: 10px"></a>
+<div style="max-width: 420px; display: flex; flex-direction: column; gap: 10px">
+<img id="goods-main" src="images/goods/dad-black-1.jpg" alt="Dad Cap, Black" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; border-radius: 10px; background: #d0d0d0">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<button type="button" class="goods-thumb" data-j="1" aria-pressed="true" aria-label="Photo 1 of 3"><img src="images/goods/dad-black-1.jpg" alt=""></button>
+<button type="button" class="goods-thumb" data-j="2" aria-pressed="false" aria-label="Photo 2 of 3"><img src="images/goods/dad-black-2.jpg" alt=""></button>
+<button type="button" class="goods-thumb" data-j="3" aria-pressed="false" aria-label="Photo 3 of 3"><img src="images/goods/dad-black-3.jpg" alt=""></button>
+</div>
+</div>
 </div>
 <div style="flex: 2 1 520px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 44px 24px">
-<div>
+<div style="grid-column: 1 / -1">
 <div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ITEM</div>
-<div style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">DAD CAP</div>
+<div id="goods-item" style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">DAD CAP, BLACK</div>
 </div>
 <div>
 <div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ PRICE</div>
 <div style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">[PRICE]</div>
-</div>
-<div>
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ STYLES</div>
-<div style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">3</div>
-</div>
-<div>
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ COLOURS</div>
-<div style="display: flex; gap: 6px">
-<div style="width: 64px; height: 44px; background: #000; border: 1px solid #1b1b1d; box-sizing: border-box"></div>
-<div style="width: 64px; height: 44px; background: #fff; border: 1px solid #1b1b1d; box-sizing: border-box"></div>
-</div>
 </div>
 <div>
 <div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ FIT</div>
@@ -107,10 +110,10 @@ a:hover { opacity: .6; }
 </div>
 <div style="grid-column: 1 / -1">
 <div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ALL GOODS</div>
-<a href="#goods" style="display: flex; justify-content: space-between; gap: 16px; text-decoration: none; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em"><span>DAD CAP, BLACK</span><span style="color: #767676">01</span></a>
-<a href="#goods" style="display: flex; justify-content: space-between; gap: 16px; text-decoration: none; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em"><span>DAD CAP, WHITE</span><span style="color: #767676">02</span></a>
-<a href="#goods" style="display: flex; justify-content: space-between; gap: 16px; text-decoration: none; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em"><span>STRUCTURED CAP, WHITE</span><span style="color: #767676">03</span></a>
-<div style="display: flex; justify-content: space-between; gap: 16px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em; color: #767676"><span>STRUCTURED CAP, BLACK</span></div>
+<button type="button" class="goods-row" data-i="0" aria-pressed="true"><span>DAD CAP, BLACK</span><span class="goods-n">01</span></button>
+<button type="button" class="goods-row" data-i="1" aria-pressed="false"><span>DAD CAP, GREY</span><span class="goods-n">02</span></button>
+<button type="button" class="goods-row" data-i="2" aria-pressed="false"><span>STRUCTURED CAP, WHITE</span><span class="goods-n">03</span></button>
+<button type="button" class="goods-row" data-i="3" aria-pressed="false"><span>STRUCTURED CAP, BLACK</span><span class="goods-n">04</span></button>
 </div>
 </div>
 </div>
@@ -330,6 +333,37 @@ a:hover { opacity: .6; }
       moveTo(total - Number(b.getAttribute('data-dir')) * wrap.clientWidth * 0.6);
     });
   });
+})();
+
+(function () {
+  var products = [
+    { item: 'DAD CAP', colour: 'BLACK', base: 'dad-black' },
+    { item: 'DAD CAP', colour: 'GREY', base: 'dad-grey' },
+    { item: 'STRUCTURED CAP', colour: 'WHITE', base: 'structured-white' },
+    { item: 'STRUCTURED CAP', colour: 'BLACK', base: 'structured-black' }
+  ];
+  var main = document.getElementById('goods-main');
+  if (!main) return;
+  var item = document.getElementById('goods-item');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.goods-row'));
+  var thumbs = Array.prototype.slice.call(document.querySelectorAll('.goods-thumb'));
+  var current = 0;
+  function src(p, j) { return 'images/goods/' + p.base + '-' + j + '.jpg'; }
+  function photo(j) {
+    main.src = src(products[current], j);
+    thumbs.forEach(function (t) { t.setAttribute('aria-pressed', String(Number(t.getAttribute('data-j')) === j)); });
+  }
+  function select(i) {
+    current = i;
+    var p = products[i];
+    item.textContent = p.item + ', ' + p.colour;
+    main.alt = p.item.charAt(0) + p.item.slice(1).toLowerCase() + ', ' + p.colour.charAt(0) + p.colour.slice(1).toLowerCase();
+    rows.forEach(function (r, k) { r.setAttribute('aria-pressed', String(k === i)); });
+    thumbs.forEach(function (t) { t.querySelector('img').src = src(p, Number(t.getAttribute('data-j'))); });
+    photo(1);
+  }
+  rows.forEach(function (r, k) { r.addEventListener('click', function () { select(k); }); });
+  thumbs.forEach(function (t) { t.addEventListener('click', function () { photo(Number(t.getAttribute('data-j'))); }); });
 })();
 </script>
 </body>
