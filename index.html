@@ -29,6 +29,8 @@
   d.className += ' anim';
   // First-time visitors also get the home-screen content animating in with the logo
   try { if (!localStorage.getItem('tfn-intro-seen')) d.className += ' intro'; } catch (e) {}
+  // Failsafe: if the intro script never runs, show the menu anyway (no-op otherwise)
+  setTimeout(function () { d.classList.remove('intro'); }, 4000);
 })();
 </script>
 <style>
@@ -65,9 +67,8 @@ html.anim .rl.in::after, html.anim .rt.in::before { transform: scaleX(1); }
 .g-arrow:disabled { opacity: .3; cursor: default !important; }
 /* Logo build-in (hidden until the script sets it up; failsafe reveal after 3s) */
 @keyframes tfnShow { to { visibility: visible; } }
-@keyframes tfnShowEl { to { opacity: 1; transform: none; } }
 html.anim #hero-mark { visibility: hidden; animation: tfnShow 0s 3s forwards; }
-html.intro .intro-el { opacity: 0; transform: translateY(14px); transition: opacity .8s cubic-bezier(0.22, 1, 0.36, 1), transform .8s cubic-bezier(0.22, 1, 0.36, 1), background-size .45s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--d) * 70ms), calc(var(--d) * 70ms), 0s; animation: tfnShowEl 0s 4s forwards; }
+html.intro .intro-el { opacity: 0; transform: translateY(14px); transition: opacity .8s cubic-bezier(0.22, 1, 0.36, 1), transform .8s cubic-bezier(0.22, 1, 0.36, 1), background-size .45s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--d) * 70ms), calc(var(--d) * 70ms), 0s; }
 html.intro.go .intro-el { opacity: 1; transform: none; }
 /* About mark drift */
 .story-mark { will-change: transform; }
@@ -550,6 +551,8 @@ html.lenis { scroll-behavior: auto; }
     var root = document.documentElement;
     if (root.classList.contains('intro')) {
       setTimeout(function () { root.classList.add('go'); }, 850);
+      // Once everything has landed, drop the intro styles so nothing animates out
+      setTimeout(function () { root.classList.remove('intro', 'go'); }, 2400);
       try { localStorage.setItem('tfn-intro-seen', '1'); } catch (e) {}
     }
   }
