@@ -22,11 +22,43 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&amp;family=Jost:wght@400&amp;display=swap">
+<script>
+if ('IntersectionObserver' in window && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) document.documentElement.className += ' anim';
+</script>
 <style>
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: #1b1b1d; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
-a:hover { opacity: .6; }
+/* Text links: underline slides in from the left */
+a.ul { display: inline-block; text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .45s cubic-bezier(0.22, 1, 0.36, 1); }
+a.ul:hover, a.ul:focus-visible { background-size: 100% 1px; }
+a.tfn-home { cursor: pointer; }
+/* Scroll reveals (only when JS is running and motion is allowed) */
+html.anim .rv { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(0.22, 1, 0.36, 1), transform .9s cubic-bezier(0.22, 1, 0.36, 1); }
+html.anim .rv[data-d="1"] { transition-delay: .12s; }
+html.anim .rv.in { opacity: 1; transform: none; }
+/* Rule lines that draw in left to right */
+.rl, .rt { position: relative; }
+.rl::after, .rt::before { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: var(--rl); transform-origin: left; }
+.rl::after { bottom: 0; }
+.rt::before { top: 0; }
+html.anim .rl::after, html.anim .rt::before { transform: scaleX(0); transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+html.anim .rl.in::after, html.anim .rt.in::before { transform: scaleX(1); }
+/* Goods */
+#goods-item { will-change: transform, opacity; }
+.goods-row { transition: color .3s ease; }
+.goods-row > span:first-child { display: inline-block; transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1); }
+.goods-row:hover > span:first-child, .goods-row[aria-pressed="true"] > span:first-child { transform: translateX(10px); }
+.goods-thumb { transition: outline-color .3s ease; }
+.goods-thumb img { transition: transform .6s cubic-bezier(0.22, 1, 0.36, 1); }
+.goods-thumb:hover img { transform: scale(1.05); }
+/* Gallery arrows */
+.g-arrow { transition: background-color .25s ease, color .25s ease, transform .15s ease, opacity .3s ease; }
+.g-arrow:hover:not(:disabled) { background: #1b1b1d !important; color: #e6e6e6 !important; }
+.g-arrow:active:not(:disabled) { transform: scale(0.92); }
+.g-arrow:disabled { opacity: .3; cursor: default !important; }
+/* About mark drift */
+.story-mark { will-change: transform; }
 html.lenis, html.lenis body { height: auto; }
 html.lenis { scroll-behavior: auto; }
 .lenis.lenis-stopped { overflow: clip; }
@@ -47,15 +79,15 @@ html.lenis { scroll-behavior: auto; }
 <section id="top" style="position: relative; background: #fff; color: #000; overflow: hidden; min-height: max(100svh, 600px); display: flex; flex-direction: column; justify-content: space-between">
 <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; padding: 20px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px 48px; font-size: 13px; font-weight: 500; line-height: 1.25">
 <div style="display: flex; flex-wrap: wrap; gap: 16px 48px">
-<nav style="display: flex; flex-direction: column">
-<a href="#about" style="text-decoration: none; padding: 2px 0">1.0 Brand</a>
-<a href="#goods" style="text-decoration: none; padding: 2px 0">2.0 Goods</a>
-<a href="#story" style="text-decoration: none; padding: 2px 0">3.0 About</a>
-<a href="#work" style="text-decoration: none; padding: 2px 0">4.0 Friends</a>
-<a href="#contact" style="text-decoration: none; padding: 2px 0">5.0 Contact</a>
+<nav style="display: flex; flex-direction: column; align-items: flex-start">
+<a href="#about" class="ul" style="padding: 2px 0">1.0 Brand</a>
+<a href="#goods" class="ul" style="padding: 2px 0">2.0 Goods</a>
+<a href="#story" class="ul" style="padding: 2px 0">3.0 About</a>
+<a href="#work" class="ul" style="padding: 2px 0">4.0 Friends</a>
+<a href="#contact" class="ul" style="padding: 2px 0">5.0 Contact</a>
 </nav>
 </div>
-<a href="#goods" style="text-decoration: none; padding: 2px 0">Cart (0)</a>
+<a href="#goods" class="ul" style="padding: 2px 0">Shop ↓</a>
 </header>
 <div style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 40px 24px">
 <svg viewBox="0 0 166 100" role="img" aria-label="The Five Nine" style="width: 810px; max-width: 100%; height: auto; display: block"><path d="M48 2 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#000" stroke-width="7.6"></path><text x="78.4" y="63.8" font-size="10.9" textLength="84" lengthAdjust="spacing" fill="#000" font-family="Jost, 'Hanken Grotesk', sans-serif">THE FIVE NINE</text></svg>
@@ -64,26 +96,26 @@ html.lenis { scroll-behavior: auto; }
 
 <section id="about" style="padding: 20px 24px 120px">
 <div style="display: flex; justify-content: space-between; gap: 24px; font-size: 13px; font-weight: 500; line-height: 1.25; color: #9a9a9a; padding-bottom: 96px">
-<span>The Five Nine<br>Est. 2015</span><span>Brand</span>
+<a href="#top" class="ul tfn-home">The Five Nine<br>Est. 2015</a><span>Brand</span>
 </div>
-<div style="border-top: 1px solid #5a5a5a; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px">
-<div style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #7a7a7a">1.0</div>
+<div class="rt" style="--rl: #5a5a5a; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px">
+<div class="rv" style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #7a7a7a">1.0</div>
 <div style="flex: 1 1 520px">
-<h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">THE BRAND</h2>
-<p style="margin: 0; max-width: 21em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em; color: #7a7a7a">CALL TIME AT FIVE. WRAP AT NINE. THE HOURS ON EITHER SIDE OF THE NORM ARE THE ONES WE BUILT OUR LIVES AROUND.</p>
+<h2 class="rv" style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">THE BRAND</h2>
+<p class="rv" data-d="1" style="margin: 0; max-width: 21em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em; color: #7a7a7a">CALL TIME AT FIVE. WRAP AT NINE. THE HOURS ON EITHER SIDE OF THE NORM ARE THE ONES WE BUILT OUR LIVES AROUND.</p>
 </div>
 </div>
 <div style="margin-top: 120px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px 24px">
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONCEPT</div>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONCEPT</div>
 <svg viewBox="0 0 420 170" role="img" aria-label="A clock reading nine, plus a square divided by lines toward twelve, nine and five" style="width: 100%; height: auto; display: block; margin-top: 28px"><g fill="none" stroke="#efece6" stroke-width="3"><circle cx="76" cy="85" r="54"></circle><path d="M76 44 V85 H49"></path><path d="M198 85 H222 M210 73 V97"></path><rect x="290" y="31" width="108" height="108"></rect><path d="M344 31 V85 H290 M344 85 L398 139"></path></g><text x="33" y="88" font-size="9" fill="#efece6" font-family="'Hanken Grotesk', sans-serif">9</text></svg>
 </div>
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONSTRUCTION</div>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONSTRUCTION</div>
 <svg viewBox="0 0 420 170" role="img" aria-label="Five steps: a single tick grows into the three-armed mark" style="width: 100%; height: auto; display: block; margin-top: 28px"><g fill="none" stroke="#efece6" stroke-width="5.5"><path d="M42 72 V88"></path><path d="M126 40 V88 L152 62"></path><path d="M210 40 V88 L228.5 120"></path><path d="M294 40 V88 L312.5 120 M294 88 L268 114"></path><path d="M378 40 V88 H341 M378 88 L396.5 120"></path></g><g font-size="9" fill="#9a9a9a" text-anchor="middle" font-family="'Hanken Grotesk', sans-serif"><text x="42" y="158">1</text><text x="126" y="158">2</text><text x="210" y="158">3</text><text x="294" y="158">4</text><text x="378" y="158">5</text></g></svg>
 </div>
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ MARK</div>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ MARK</div>
 <svg viewBox="0 0 420 170" role="img" aria-label="The Five Nine logo with wordmark" style="width: 100%; height: auto; display: block; margin-top: 28px"><g transform="translate(85 10) scale(1.5)"><path d="M48 2 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#efece6" stroke-width="7.6"></path><text x="78.4" y="63.8" font-size="10.9" textLength="84" lengthAdjust="spacing" fill="#efece6" font-family="Jost, 'Hanken Grotesk', sans-serif">THE FIVE NINE</text></g></svg>
 </div>
 </div>
@@ -91,14 +123,14 @@ html.lenis { scroll-behavior: auto; }
 
 <section id="goods" style="background: #e6e6e6; color: #1b1b1d; padding: 20px 24px 24px">
 <div style="display: flex; justify-content: space-between; gap: 24px; font-size: 13px; font-weight: 500; line-height: 1.25; color: #4a4a4a; padding-bottom: 72px">
-<span>The Five Nine<br>Est. 2015</span><span>Goods</span>
+<a href="#top" class="ul tfn-home">The Five Nine<br>Est. 2015</a><span>Goods</span>
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 40px 24px; align-items: flex-start">
-<div style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #767676">2.0</div>
+<div class="rv" style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #767676">2.0</div>
 <div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 28px">
-<h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">GOODS</h2>
+<h2 class="rv" style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">GOODS</h2>
 <div style="max-width: 420px; display: flex; flex-direction: column; gap: 10px">
-<img id="goods-main" src="images/goods/dad-black-1.jpg" alt="Dad Cap, Black" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; border-radius: 10px; background: #d0d0d0">
+<div id="goods-stage" style="position: relative; border-radius: 10px; overflow: hidden; background: #d0d0d0"><img id="goods-main" src="images/goods/dad-black-1.jpg" alt="Dad Cap, Black" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block"></div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
 <button type="button" class="goods-thumb" data-j="1" aria-pressed="true" aria-label="Photo 1 of 3"><img src="images/goods/dad-black-1.jpg" alt=""></button>
 <button type="button" class="goods-thumb" data-j="2" aria-pressed="false" aria-label="Photo 2 of 3"><img src="images/goods/dad-black-2.jpg" alt=""></button>
@@ -108,23 +140,23 @@ html.lenis { scroll-behavior: auto; }
 </div>
 <div style="flex: 2 1 520px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 44px 24px">
 <div style="grid-column: 1 / -1">
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ITEM</div>
+<div class="rl" style="--rl: #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ITEM</div>
 <div id="goods-item" style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">DAD CAP, BLACK</div>
 </div>
 <div>
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ PRICE</div>
+<div class="rl" style="--rl: #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ PRICE</div>
 <div style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">$39</div>
 </div>
 <div>
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ FIT</div>
+<div class="rl" style="--rl: #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ FIT</div>
 <div style="font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">ONE SIZE</div>
 </div>
 <div>
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ BUY</div>
+<div class="rl" style="--rl: #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ BUY</div>
 <span style="display: inline-block; padding: 14px 22px; background: linear-gradient(180deg, #af0096, #d6008f); color: #fff; font-size: 15px; font-weight: 500">COMING SOON</span>
 </div>
 <div style="grid-column: 1 / -1">
-<div style="border-bottom: 1px solid #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ALL GOODS</div>
+<div class="rl" style="--rl: #1b1b1d; padding-bottom: 10px; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">↓ ALL GOODS</div>
 <button type="button" class="goods-row" data-i="0" aria-pressed="true"><span>DAD CAP, BLACK</span><span class="goods-n">01</span></button>
 <button type="button" class="goods-row" data-i="1" aria-pressed="false"><span>DAD CAP, GREY</span><span class="goods-n">02</span></button>
 <button type="button" class="goods-row" data-i="2" aria-pressed="false"><span>STRUCTURED CAP, WHITE</span><span class="goods-n">03</span></button>
@@ -136,22 +168,22 @@ html.lenis { scroll-behavior: auto; }
 </section>
 
 <section id="story" style="background: linear-gradient(180deg, #af0096, #ff008c); color: #fff; position: relative; overflow: hidden; min-height: 620px; padding: 20px 24px 28px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
-<div style="font-size: 13px; font-weight: 500; line-height: 1.25; color: #fff">The Five Nine<br>3.0 About</div>
-<svg viewBox="0 0 80 100" aria-hidden="true" style="position: absolute; right: -3%; bottom: -22%; width: clamp(380px, 46vw, 680px); height: auto; overflow: visible"><path d="M48 -80 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#efece6" stroke-width="7.6"></path></svg>
+<div style="font-size: 13px; font-weight: 500; line-height: 1.25; color: #fff; position: relative; z-index: 1"><a href="#top" class="ul tfn-home">The Five Nine</a><br>3.0 About</div>
+<svg class="story-mark" viewBox="0 0 80 100" aria-hidden="true" style="position: absolute; right: -3%; bottom: -22%; width: clamp(380px, 46vw, 680px); height: auto; overflow: visible"><path d="M48 -80 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#efece6" stroke-width="7.6"></path></svg>
 <div style="position: relative; max-width: 30em; display: flex; flex-direction: column; gap: 20px">
-<h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">ABOUT</h2>
-<p style="margin: 0; font-size: 24px; line-height: 1.2; color: #fff">Two friends, 2015, photographing campaigns for automotive and athletic brands. The name was how the days ran. It came to mean the path itself.</p>
+<h2 class="rv" style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">ABOUT</h2>
+<p class="rv" data-d="1" style="margin: 0; font-size: 24px; line-height: 1.2; color: #fff">Two friends, 2015, photographing campaigns for automotive and athletic brands. The name was how the days ran. It came to mean the path itself.</p>
 </div>
 </section>
 
 <section id="work" style="background: #e6e6e6; color: #1b1b1d; padding: 20px 24px 24px">
 <div style="display: flex; justify-content: space-between; gap: 24px; font-size: 13px; font-weight: 500; line-height: 1.25; color: #4a4a4a; padding-bottom: 72px">
-<span>The Five Nine<br>Est. 2015</span><span>Friends</span>
+<a href="#top" class="ul tfn-home">The Five Nine<br>Est. 2015</a><span>Friends</span>
 </div>
-<div style="border-top: 1px solid #1b1b1d; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 40px 24px; align-items: flex-start">
-<div style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #767676">4.0</div>
+<div class="rt" style="--rl: #1b1b1d; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 40px 24px; align-items: flex-start">
+<div class="rv" style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #767676">4.0</div>
 <div style="flex: 1 1 360px">
-<h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">FRIENDS &amp; FOLKS<br><span style="color: #767676">THE FIVE NINE, WORN.</span></h2>
+<h2 class="rv" style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">FRIENDS &amp; FOLKS<br><span style="color: #767676">THE FIVE NINE, WORN.</span></h2>
 </div>
 </div>
 <div style="margin-top: 96px; overflow: hidden">
@@ -238,12 +270,12 @@ html.lenis { scroll-behavior: auto; }
 </div>
 </div>
 </div>
-<div style="margin-top: 20px; border-top: 1px solid #1b1b1d; padding-top: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">
+<div class="rt" style="--rl: #1b1b1d; margin-top: 20px; padding-top: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #4a4a4a">
 <span>↔ DRAG TO BROWSE</span>
 <span style="display: flex; align-items: center; gap: 8px">
 <span style="margin-right: 12px">16 PHOTOS</span>
-<button type="button" data-dir="-1" aria-label="Previous photos" style="width: 44px; height: 44px; border: 1px solid #1b1b1d; background: transparent; color: #1b1b1d; font: inherit; font-size: 18px; cursor: pointer; padding: 0">←</button>
-<button type="button" data-dir="1" aria-label="Next photos" style="width: 44px; height: 44px; border: 1px solid #1b1b1d; background: transparent; color: #1b1b1d; font: inherit; font-size: 18px; cursor: pointer; padding: 0">→</button>
+<button type="button" class="g-arrow" data-dir="-1" aria-label="Previous photos" style="width: 44px; height: 44px; border: 1px solid #1b1b1d; background: transparent; color: #1b1b1d; font: inherit; font-size: 18px; cursor: pointer; padding: 0">←</button>
+<button type="button" class="g-arrow" data-dir="1" aria-label="Next photos" style="width: 44px; height: 44px; border: 1px solid #1b1b1d; background: transparent; color: #1b1b1d; font: inherit; font-size: 18px; cursor: pointer; padding: 0">→</button>
 </span>
 </div>
 <div style="margin-top: 96px"><svg viewBox="0 0 80 100" width="26" height="33" role="img" aria-label="The Five Nine" style="display: block"><path d="M48 2 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#1b1b1d" stroke-width="7.6"></path></svg></div>
@@ -251,36 +283,35 @@ html.lenis { scroll-behavior: auto; }
 
 <footer id="contact" style="padding: 20px 24px 24px">
 <div style="display: flex; justify-content: space-between; gap: 24px; font-size: 13px; font-weight: 500; line-height: 1.25; color: #9a9a9a; padding-bottom: 96px">
-<span>The Five Nine<br>Est. 2015</span><span>Contact</span>
+<a href="#top" class="ul tfn-home">The Five Nine<br>Est. 2015</a><span>Contact</span>
 </div>
-<div style="border-top: 1px solid #5a5a5a; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px">
-<div style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #7a7a7a">5.0</div>
+<div class="rt" style="--rl: #5a5a5a; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px">
+<div class="rv" style="flex: 0 0 12%; min-width: 90px; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #7a7a7a">5.0</div>
 <div style="flex: 1 1 520px">
-<h2 style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">THAT'S A WRAP.</h2>
-<p style="margin: 0; max-width: 21em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em; color: #7a7a7a">CALL TIME IS FIVE TOMORROW.</p>
+<h2 class="rv" style="margin: 0; font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em">THAT'S A WRAP.</h2>
+<p class="rv" data-d="1" style="margin: 0; max-width: 21em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -0.03em; color: #7a7a7a">CALL TIME IS FIVE TOMORROW.</p>
 </div>
 </div>
 <div style="margin-top: 120px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px 24px">
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONTACT</div>
-<a href="mailto:creative@thefivenine.com" style="display: inline-block; padding: 10px 0; font-size: 14px; font-weight: 500">creative@thefivenine.com</a>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ CONTACT</div>
+<a href="mailto:creative@thefivenine.com" class="ul" style="margin: 10px 0; font-size: 14px; font-weight: 500">creative@thefivenine.com</a>
 </div>
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ FOLLOW</div>
-<a href="https://www.instagram.com/thefivenine/" target="_blank" rel="noopener" style="display: inline-block; padding: 10px 0; font-size: 14px; font-weight: 500">@thefivenine</a>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ FOLLOW</div>
+<a href="https://www.instagram.com/thefivenine/" target="_blank" rel="noopener" class="ul" style="margin: 10px 0; font-size: 14px; font-weight: 500">@thefivenine</a>
 </div>
 <div>
-<div style="border-bottom: 1px solid #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ SHOP</div>
+<div class="rl" style="--rl: #5a5a5a; padding-bottom: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #9a9a9a">↓ SHOP</div>
 <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; font-weight: 500">
-<a href="#goods" style="padding: 10px 0">Goods</a>
-<a href="#goods" style="padding: 10px 0">Shipping &amp; Returns</a>
+<a href="#goods" class="ul" style="margin: 10px 0">Goods</a>
 </div>
 </div>
 </div>
-<div style="margin-top: 120px; border-top: 1px solid #5a5a5a; padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 24px; font-size: 13px; font-weight: 500; color: #9a9a9a">
+<div class="rt" style="--rl: #5a5a5a; margin-top: 120px; padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 24px; font-size: 13px; font-weight: 500; color: #9a9a9a">
 <svg viewBox="0 0 80 100" width="26" height="33" role="img" aria-label="The Five Nine"><path d="M48 2 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#efece6" stroke-width="7.6"></path></svg>
 <span>© 2026 The Five Nine</span>
-<a href="#top" style="padding: 12px 0; color: #efece6">Back to top ↑</a>
+<a href="#top" class="ul" style="margin: 12px 0; color: #efece6">Back to top ↑</a>
 </div>
 </footer>
 
@@ -352,9 +383,14 @@ html.lenis { scroll-behavior: auto; }
     check();
     if (cur !== total) raf = requestAnimationFrame(tick);
   }
+  var arrows = Array.prototype.slice.call(document.querySelectorAll('button[data-dir]'));
   function moveTo(x) {
     var min = Math.min(0, wrap.clientWidth - track.scrollWidth);
     total = Math.max(min, Math.min(0, x));
+    arrows.forEach(function (b) {
+      var dir = Number(b.getAttribute('data-dir'));
+      b.disabled = dir < 0 ? total >= -0.5 : total <= min + 0.5;
+    });
     if (!raf) raf = requestAnimationFrame(tick);
   }
 
@@ -372,11 +408,12 @@ html.lenis { scroll-behavior: auto; }
   track.addEventListener('pointercancel', end);
   window.addEventListener('resize', function () { moveTo(total); });
 
-  Array.prototype.forEach.call(document.querySelectorAll('button[data-dir]'), function (b) {
+  arrows.forEach(function (b) {
     b.addEventListener('click', function () {
       moveTo(total - Number(b.getAttribute('data-dir')) * wrap.clientWidth * 0.6);
     });
   });
+  moveTo(0);
 })();
 
 (function () {
@@ -391,16 +428,50 @@ html.lenis { scroll-behavior: auto; }
   var item = document.getElementById('goods-item');
   var rows = Array.prototype.slice.call(document.querySelectorAll('.goods-row'));
   var thumbs = Array.prototype.slice.call(document.querySelectorAll('.goods-thumb'));
-  var current = 0;
+  var current = 0, seq = 0, overlay = null;
+  var stage = document.getElementById('goods-stage');
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function src(p, j) { return 'images/goods/' + p.base + '-' + j + '.jpg'; }
+
+  // Preload every product photo once the page has loaded, so switching never flashes
+  window.addEventListener('load', function () {
+    products.forEach(function (p) { [1, 2, 3].forEach(function (j) { var im = new Image(); im.src = src(p, j); }); });
+  });
+
+  // Crossfade the main photo: new image fades in on top, then replaces the old one
+  function show(url) {
+    var token = ++seq;
+    if (reduced || !main.animate) { main.src = url; return; }
+    var next = new Image();
+    next.src = url;
+    var ready = next.decode ? next.decode() : Promise.resolve();
+    ready.catch(function () {}).then(function () {
+      if (token !== seq) return;
+      if (overlay) { overlay.remove(); overlay = null; }
+      var top = document.createElement('img');
+      top.src = url; top.alt = '';
+      top.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0';
+      stage.appendChild(top);
+      overlay = top;
+      var a = top.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
+      a.onfinish = function () {
+        main.src = url;
+        if (overlay === top) { top.remove(); overlay = null; }
+      };
+    });
+  }
   function photo(j) {
-    main.src = src(products[current], j);
+    show(src(products[current], j));
     thumbs.forEach(function (t) { t.setAttribute('aria-pressed', String(Number(t.getAttribute('data-j')) === j)); });
   }
   function select(i) {
+    if (i === current && item.textContent) { photo(1); return; }
     current = i;
     var p = products[i];
     item.textContent = p.item + ', ' + p.colour;
+    if (!reduced && item.animate) {
+      item.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 550, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+    }
     main.alt = p.item.charAt(0) + p.item.slice(1).toLowerCase() + ', ' + p.colour.charAt(0) + p.colour.slice(1).toLowerCase();
     rows.forEach(function (r, k) { r.setAttribute('aria-pressed', String(k === i)); });
     thumbs.forEach(function (t) { t.querySelector('img').src = src(p, Number(t.getAttribute('data-j'))); });
@@ -408,6 +479,67 @@ html.lenis { scroll-behavior: auto; }
   }
   rows.forEach(function (r, k) { r.addEventListener('click', function () { select(k); }); });
   thumbs.forEach(function (t) { t.addEventListener('click', function () { photo(Number(t.getAttribute('data-j'))); }); });
+})();
+
+// Micro animations: scroll reveals, clock-arm spin, About mark drift
+(function () {
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+
+  // Reveals and rule lines
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    Array.prototype.forEach.call(document.querySelectorAll('.rv, .rl, .rt'), function (el) { io.observe(el); });
+  }
+
+  // Split each logo mark into the fixed L and a rotating 5 o'clock arm
+  var FULL = 'M48 2 L48 60 L4 60 M48 60 L69.9 98';
+  var arms = [];
+  Array.prototype.forEach.call(document.querySelectorAll('path'), function (p) {
+    if (p.getAttribute('d') !== FULL) return;
+    p.setAttribute('d', 'M48 2 L48 60 L4 60');
+    var arm = p.cloneNode(false);
+    arm.setAttribute('d', 'M48 60 L69.9 98');
+    p.parentNode.insertBefore(arm, p.nextSibling);
+    arms.push(arm);
+    var svg = p.ownerSVGElement;
+    if (svg) svg.addEventListener('mouseenter', function () { spin(arm); });
+  });
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function spin(arm) {
+    if (arm._spinning) return;
+    arm._spinning = true;
+    var t0 = performance.now();
+    function frame(t) {
+      var p = Math.min(1, (t - t0) / 1800);
+      arm.setAttribute('transform', 'rotate(' + (360 * ease(p)).toFixed(2) + ' 48 60)');
+      if (p < 1) requestAnimationFrame(frame);
+      else { arm.removeAttribute('transform'); arm._spinning = false; }
+    }
+    requestAnimationFrame(frame);
+  }
+  // Hero mark does one full turn on load
+  if (arms[0]) setTimeout(function () { spin(arms[0]); }, 450);
+
+  // About mark drifts as the section scrolls past
+  var story = document.getElementById('story');
+  var mark = story && story.querySelector('.story-mark');
+  if (mark) {
+    var ticking = false;
+    function drift() {
+      ticking = false;
+      var r = story.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.bottom < 0 || r.top > vh) return;
+      var prog = (vh - r.top) / (vh + r.height); // 0 → 1 through the viewport
+      mark.style.transform = 'translate3d(0,' + ((0.5 - prog) * 120).toFixed(1) + 'px,0) rotate(' + ((prog - 0.5) * 6).toFixed(2) + 'deg)';
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(drift); } }, { passive: true });
+    drift();
+  }
 })();
 </script>
 </body>
