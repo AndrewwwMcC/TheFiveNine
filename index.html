@@ -23,7 +23,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&amp;family=Jost:wght@400&amp;display=swap">
 <script>
-if ('IntersectionObserver' in window && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) document.documentElement.className += ' anim';
+(function () {
+  var d = document.documentElement;
+  if (!('IntersectionObserver' in window) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  d.className += ' anim';
+  // First-time visitors also get the home-screen content animating in with the logo
+  try { if (!localStorage.getItem('tfn-intro-seen')) d.className += ' intro'; } catch (e) {}
+})();
 </script>
 <style>
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -57,6 +63,12 @@ html.anim .rl.in::after, html.anim .rt.in::before { transform: scaleX(1); }
 .g-arrow:hover:not(:disabled) { background: #1b1b1d !important; color: #e6e6e6 !important; }
 .g-arrow:active:not(:disabled) { transform: scale(0.92); }
 .g-arrow:disabled { opacity: .3; cursor: default !important; }
+/* Logo build-in (hidden until the script sets it up; failsafe reveal after 3s) */
+@keyframes tfnShow { to { visibility: visible; } }
+@keyframes tfnShowEl { to { opacity: 1; transform: none; } }
+html.anim #hero-mark { visibility: hidden; animation: tfnShow 0s 3s forwards; }
+html.intro .intro-el { opacity: 0; transform: translateY(14px); transition: opacity .8s cubic-bezier(0.22, 1, 0.36, 1), transform .8s cubic-bezier(0.22, 1, 0.36, 1), background-size .45s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--d) * 70ms), calc(var(--d) * 70ms), 0s; animation: tfnShowEl 0s 4s forwards; }
+html.intro.go .intro-el { opacity: 1; transform: none; }
 /* About mark drift */
 .story-mark { will-change: transform; }
 html.lenis, html.lenis body { height: auto; }
@@ -80,17 +92,17 @@ html.lenis { scroll-behavior: auto; }
 <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; padding: 20px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px 48px; font-size: 13px; font-weight: 500; line-height: 1.25">
 <div style="display: flex; flex-wrap: wrap; gap: 16px 48px">
 <nav style="display: flex; flex-direction: column; align-items: flex-start">
-<a href="#about" class="ul" style="padding: 2px 0">1.0 Brand</a>
-<a href="#goods" class="ul" style="padding: 2px 0">2.0 Goods</a>
-<a href="#story" class="ul" style="padding: 2px 0">3.0 About</a>
-<a href="#work" class="ul" style="padding: 2px 0">4.0 Friends</a>
-<a href="#contact" class="ul" style="padding: 2px 0">5.0 Contact</a>
+<a href="#about" class="ul intro-el" style="--d: 0; padding: 2px 0">1.0 Brand</a>
+<a href="#goods" class="ul intro-el" style="--d: 1; padding: 2px 0">2.0 Goods</a>
+<a href="#story" class="ul intro-el" style="--d: 2; padding: 2px 0">3.0 About</a>
+<a href="#work" class="ul intro-el" style="--d: 3; padding: 2px 0">4.0 Friends</a>
+<a href="#contact" class="ul intro-el" style="--d: 4; padding: 2px 0">5.0 Contact</a>
 </nav>
 </div>
-<a href="#goods" class="ul" style="padding: 2px 0">Shop ↓</a>
+<a href="#goods" class="ul intro-el" style="--d: 5; padding: 2px 0">Shop ↓</a>
 </header>
 <div style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 40px 24px">
-<svg viewBox="0 0 166 100" role="img" aria-label="The Five Nine" style="width: 810px; max-width: 100%; height: auto; display: block"><path d="M48 2 L48 60 L4 60 M48 60 L69.9 98" fill="none" stroke="#000" stroke-width="7.6"></path><text x="78.4" y="63.8" font-size="10.9" textLength="84" lengthAdjust="spacing" fill="#000" font-family="Jost, 'Hanken Grotesk', sans-serif">THE FIVE NINE</text></svg>
+<svg id="hero-mark" viewBox="0 0 166 100" role="img" aria-label="The Five Nine" style="width: 810px; max-width: 100%; height: auto; display: block"><g fill="none" stroke="#000" stroke-width="7.6"><path class="m-stem" d="M48 63.8 L48 2"></path><path class="m-hor" d="M48 60 L4 60"></path><path class="m-arm" d="M48 60 L69.9 98"></path></g><text id="hero-word" x="78.4" y="63.8" font-size="10.9" textLength="84" lengthAdjust="spacing" fill="#000" font-family="Jost, 'Hanken Grotesk', sans-serif">THE FIVE NINE</text></svg>
 </div>
 </section>
 
@@ -496,34 +508,73 @@ html.lenis { scroll-behavior: auto; }
     Array.prototype.forEach.call(document.querySelectorAll('.rv, .rl, .rt'), function (el) { io.observe(el); });
   }
 
-  // Split each logo mark into the fixed L and a rotating 5 o'clock arm
-  var FULL = 'M48 2 L48 60 L4 60 M48 60 L69.9 98';
-  var arms = [];
-  Array.prototype.forEach.call(document.querySelectorAll('path'), function (p) {
-    if (p.getAttribute('d') !== FULL) return;
-    p.setAttribute('d', 'M48 2 L48 60 L4 60');
-    var arm = p.cloneNode(false);
-    arm.setAttribute('d', 'M48 60 L69.9 98');
-    p.parentNode.insertBefore(arm, p.nextSibling);
-    arms.push(arm);
-    var svg = p.ownerSVGElement;
-    if (svg) svg.addEventListener('mouseenter', function () { spin(arm); });
-  });
-  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-  function spin(arm) {
-    if (arm._spinning) return;
-    arm._spinning = true;
-    var t0 = performance.now();
-    function frame(t) {
-      var p = Math.min(1, (t - t0) / 1800);
-      arm.setAttribute('transform', 'rotate(' + (360 * ease(p)).toFixed(2) + ' 48 60)');
-      if (p < 1) requestAnimationFrame(frame);
-      else { arm.removeAttribute('transform'); arm._spinning = false; }
+  // Logo build, matched to the reel's opening:
+  // dot at the pivot → stem grows up → 9 o'clock arm grows left → pause → 5 o'clock arm sweeps down from 12
+  var STEM = 61.8, HOR = 44, DOT = 7.6;
+  function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function setLen(p, len) { p.style.strokeDasharray = len.toFixed(2) + ' 999'; }
+  function build(m, delay, onDone) {
+    setLen(m.stem, 0); setLen(m.hor, 0); m.arm.style.opacity = '0';
+    var t0 = performance.now() + (delay || 0);
+    function frame(now) {
+      var t = now - t0;
+      setLen(m.stem, t < 0 ? 0 : DOT + (STEM - DOT) * easeOut(clamp((t - 70) / 180)));
+      setLen(m.hor, HOR * easeOut(clamp((t - 230) / 180)));
+      if (t >= 500) {
+        m.arm.style.opacity = '';
+        m.arm.setAttribute('transform', 'rotate(' + (-150 * (1 - easeInOut(clamp((t - 500) / 600)))).toFixed(2) + ' 48 60)');
+      }
+      if (t < 1100) requestAnimationFrame(frame);
+      else {
+        m.stem.style.strokeDasharray = ''; m.hor.style.strokeDasharray = ''; m.arm.removeAttribute('transform');
+        if (onDone) onDone();
+      }
     }
     requestAnimationFrame(frame);
   }
-  // Hero mark does one full turn on load
-  if (arms[0]) setTimeout(function () { spin(arms[0]); }, 450);
+
+  // Hero: always builds on load; the wordmark follows as the arm lands
+  var hero = document.getElementById('hero-mark');
+  if (hero) {
+    var hm = { stem: hero.querySelector('.m-stem'), hor: hero.querySelector('.m-hor'), arm: hero.querySelector('.m-arm') };
+    var word = document.getElementById('hero-word');
+    build(hm, 250);
+    hero.style.visibility = 'visible';
+    if (word && word.animate) {
+      word.animate([{ opacity: 0, transform: 'translateX(-4px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 700, delay: 1150, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' });
+    }
+    // First visit: nav and shop link come in with the arm's sweep
+    var root = document.documentElement;
+    if (root.classList.contains('intro')) {
+      setTimeout(function () { root.classList.add('go'); }, 850);
+      try { localStorage.setItem('tfn-intro-seen', '1'); } catch (e) {}
+    }
+  }
+
+  // Small corner marks build the same way as they scroll into view
+  var FULL = 'M48 2 L48 60 L4 60 M48 60 L69.9 98';
+  var marks = [];
+  Array.prototype.forEach.call(document.querySelectorAll('path'), function (p) {
+    if (p.getAttribute('d') !== FULL) return;
+    var stem = p, hor = p.cloneNode(false), arm = p.cloneNode(false);
+    stem.setAttribute('d', 'M48 63.8 L48 2');
+    hor.setAttribute('d', 'M48 60 L4 60');
+    arm.setAttribute('d', 'M48 60 L69.9 98');
+    p.parentNode.insertBefore(hor, p.nextSibling);
+    p.parentNode.insertBefore(arm, hor.nextSibling);
+    var m = { stem: stem, hor: hor, arm: arm };
+    setLen(stem, 0); setLen(hor, 0); arm.style.opacity = '0';
+    marks.push(m);
+    if ('IntersectionObserver' in window) {
+      var mo = new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) { mo.disconnect(); build(m, 100); }
+      }, { rootMargin: '0px 0px -10% 0px' });
+      mo.observe(p.ownerSVGElement || p);
+    } else { build(m, 0); }
+  });
 
   // About mark drifts as the section scrolls past
   var story = document.getElementById('story');
